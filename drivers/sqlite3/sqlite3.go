@@ -8,13 +8,14 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/mattn/go-sqlite3" // DRIVER
+	// "github.com/mattn/go-sqlite3" // DRIVER
+	"github.com/glebarez/go-sqlite" // DRIVER
 	"github.com/xo/usql/drivers"
 	"github.com/xo/usql/drivers/sqlite3/sqshared"
 )
 
 func init() {
-	drivers.Register("sqlite3", drivers.Driver{
+	drivers.Register("sqlite", drivers.Driver{
 		AllowMultilineComments: true,
 		ForceParams: drivers.ForceQueryParameters([]string{
 			"loc", "auto",
@@ -28,13 +29,13 @@ func init() {
 			return "SQLite3 " + ver, nil
 		},
 		Err: func(err error) (string, string) {
-			if e, ok := err.(sqlite3.Error); ok {
-				return strconv.Itoa(int(e.Code)), e.Error()
+			if e, ok := err.(*sqlite.Error); ok {
+				return strconv.Itoa(int(e.Code())), e.Error()
 			}
 			code, msg := "", err.Error()
-			if e, ok := err.(sqlite3.ErrNo); ok {
-				code = strconv.Itoa(int(e))
-			}
+			// if e, ok := err.(*sqlite.ErrNo); ok {
+			// 	code = strconv.Itoa(int(e))
+			// }
 			return code, msg
 		},
 		ConvertBytes:      sqshared.ConvertBytes,
